@@ -30,3 +30,8 @@ __pycache__/
 .DS_Store
 *.swp
 *.swo
+
+
+ProjectProgress/motion_dataset.csv
+ProjectProgress/14525.zip
+ProjectProgress/yolo_motion_dataset_with_window_scores.csv
