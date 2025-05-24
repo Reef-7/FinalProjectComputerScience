@@ -27,33 +27,39 @@ class _UploadVideoPageState extends State<UploadVideoPage> {
       });
 
       // שליחה לשרת
-      await sendVideoToServer(files[0]);
+      await sendVideoToMultipleServers(files[0]);
     });
   }
 
-  Future<void> sendVideoToServer(html.File file) async {
-    final uri = Uri.parse('http://127.0.0.1:5000/upload');
-    final request = http.MultipartRequest('POST', uri);
-
-    // לקרוא את הקובץ כ-binary ולהמיר אותו למערך של bytes
+  Future<void> sendVideoToMultipleServers(html.File file) async {
     final reader = html.FileReader();
     reader.readAsArrayBuffer(file);
     reader.onLoadEnd.listen((e) async {
       final bytes = reader.result as List<int>;
 
-      // הוספת הקובץ לבקשה
-      request.files.add(
-          http.MultipartFile.fromBytes('file', bytes, filename: file.name));
+      // רשימת כתובות השרתים
+      final uris = [
+        Uri.parse('http://127.0.0.1:5000/upload'),
+        Uri.parse('http://127.0.0.1:5004/upload'),
+        Uri.parse('http://127.0.0.1:5002/upload')
+      ];
 
-      try {
-        final response = await request.send();
-        if (response.statusCode == 200) {
-          print('File uploaded successfully');
-        } else {
-          print('File upload failed: ${response.statusCode}');
+      for (final uri in uris) {
+        final request = http.MultipartRequest('POST', uri);
+        request.files.add(
+          http.MultipartFile.fromBytes('file', bytes, filename: file.name),
+        );
+
+        try {
+          final response = await request.send();
+          if (response.statusCode == 200) {
+            print('Uploaded to $uri successfully');
+          } else {
+            print('Upload to $uri failed: ${response.statusCode}');
+          }
+        } catch (e) {
+          print('Error uploading to $uri: $e');
         }
-      } catch (e) {
-        print('Error: $e');
       }
     });
   }
