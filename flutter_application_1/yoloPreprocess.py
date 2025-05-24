@@ -33,10 +33,11 @@ def create_empty_data_structure():
 
 @app.route('/process_videos', methods=['POST'])
 def process_videos():
-    if 'videos' not in request.files:
-        return jsonify({"error": "Missing 'videos' in request"}), 400
+    if 'file' not in request.files:
+     return jsonify({"error": "Missing 'file' in request"}), 400
 
-    files = request.files.getlist('videos')
+    files = [request.files['file']] 
+
     video_paths = []
 
     for f in files:

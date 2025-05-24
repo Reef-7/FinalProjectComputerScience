@@ -39,9 +39,9 @@ class _UploadVideoPageState extends State<UploadVideoPage> {
 
       // רשימת כתובות השרתים
       final uris = [
-        Uri.parse('http://127.0.0.1:5000/upload'),
-        Uri.parse('http://127.0.0.1:5004/upload'),
-        Uri.parse('http://127.0.0.1:5002/upload')
+        Uri.parse('http://localhost:5002/process_videos'),
+        Uri.parse('http://localhost:5000/upload'),
+        Uri.parse('http://localhost:5004/upload')
       ];
 
       for (final uri in uris) {
