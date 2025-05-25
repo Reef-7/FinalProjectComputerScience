@@ -52,7 +52,7 @@ def wait_for_server(host, port, timeout=30):
             time.sleep(1)
 
 def run_script(script_name):
-    wait_for_video(UPLOAD_FOLDER)
+    
     print(f"Starting script: {script_name}")
     # Start the script as a subprocess without waiting (non-blocking)
     process = subprocess.Popen(["python", script_name])
@@ -93,7 +93,7 @@ def run_main():
         "mediapipePreprocess.py": 5004
     }
 
-    wait_for_video(UPLOAD_FOLDER)
+    
     
     for script, port in scripts_stage_1.items():
         print(f"Running {script}...")

@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 import pandas as pd
 from ultralytics import YOLO
+import uuid
+
 
 app = Flask(__name__)
 CORS(app)
@@ -31,7 +33,7 @@ def create_empty_data_structure():
         f"{key}_confidences": [] for key in selected_keypoints
     }
 
-@app.route('/process_videos', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def process_videos():
     if 'file' not in request.files:
      return jsonify({"error": "Missing 'file' in request"}), 400

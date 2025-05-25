@@ -11,6 +11,9 @@ from sklearn.preprocessing import MinMaxScaler
 import pickle
 import joblib
 from sklearn.preprocessing import LabelEncoder
+import threading
+import time
+
 
 app = Flask(__name__)
 CORS(app)
@@ -145,5 +148,30 @@ def upload_video():
     process_video(video_path)
     return jsonify({'message': 'Video processed successfully', 'filename': video.filename}), 200
     
+
+def watch_and_process_videos():
+    print("Started watching folder for new videos...")
+    processed_files = set()
+
+    while True:
+        video_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(('.mp4', '.avi', '.mov'))]
+        for filename in video_files:
+            if filename not in processed_files:
+                video_path = os.path.join(UPLOAD_FOLDER, filename)
+                try:
+                    print(f"Processing new video: {filename}")
+                    process_video(video_path)
+                    processed_files.add(filename)
+
+
+                except Exception as e:
+                    print(f"Error processing video {filename}: {str(e)}")
+
+        time.sleep(5)
+
+
+    
 if __name__ == '__main__':
+    watcher_thread = threading.Thread(target=watch_and_process_videos, daemon=True)
+    watcher_thread.start()
     app.run(host='0.0.0.0', port=5000)
