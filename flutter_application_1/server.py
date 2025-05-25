@@ -13,7 +13,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 import time
 
-
+'''
 def wait_for_server(host, port, timeout=30):
     start_time = time.time()
     while time.time() - start_time < timeout:
@@ -24,7 +24,7 @@ def wait_for_server(host, port, timeout=30):
         except OSError:
             time.sleep(1)
     raise TimeoutError(f"Server on {host}:{port} did not start within {timeout} seconds.")
-
+'''
 
 def wait_for_video(upload_folder, video_extensions=None):
     if video_extensions is None:
@@ -50,6 +50,18 @@ def wait_for_server(host, port, timeout=30):
             if time.time() - start > timeout:
                 raise TimeoutError(f"Server at {host}:{port} did not start within {timeout} seconds.")
             time.sleep(1)
+
+def wait_for_file(directory, filename, timeout=60):
+    """Wait until a specific file appears in a directory (or current directory)."""
+    full_path = os.path.join(directory, filename) if directory else filename
+    print(f"Waiting for file {filename} in {directory or 'current directory'}...")
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        if os.path.exists(full_path):
+            print(f"Found file: {filename}")
+            return
+        time.sleep(1)
+   
 
 def run_script(script_name):
     
@@ -87,6 +99,7 @@ def run_main():
     wait_for_server("127.0.0.1", 5004)
     '''
 
+    '''
     scripts_stage_1 = {
         "movenetPreprocess.py": 5000,
         "yoloPreprocess.py": 5002,
@@ -100,6 +113,37 @@ def run_main():
         subprocess.Popen(["python", script])
         wait_for_server("127.0.0.1", port)
         print(f"{script} is ready on port {port}.")
+    '''
+
+    scripts_stage_1 = [
+        ("movenetPreprocess.py", 5000, "movenet_motion_dataset_with_window_scores.csv"),
+        ("yoloPreprocess.py", 5002, "yolo_motion_dataset_with_window_scores.csv"),
+        ("mediapipePreprocess.py", 5004, "mediapipe_motion_dataset_with_window_scores.csv")
+    ]
+    
+
+    for script, port, output_file in scripts_stage_1:
+        print(f"Running {script}...")
+
+        
+        process = subprocess.Popen(["python", script])
+
+        
+        wait_for_server("127.0.0.1", port)
+
+        
+        wait_for_file(".", output_file)
+
+        
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+            print(f"{script} terminated cleanly.")
+        except subprocess.TimeoutExpired:
+            process.kill()
+            print(f"{script} forcefully killed.")
+
+
 
     print("Step 1 complete: All initial scripts have been started.")
 
