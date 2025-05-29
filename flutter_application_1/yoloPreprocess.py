@@ -100,12 +100,12 @@ def process_videos():
         cap.release()
 
     df = pd.DataFrame(dataset)
-    df.to_csv("movenet_motion_dataset_with_window_scores.csv", index=False, encoding="utf-8-sig")
+    df.to_csv("yolo_motion_dataset_with_window_scores.csv", index=False, encoding="utf-8-sig")
 
     return jsonify({
         "message": "Processing completed",
         "frames_processed": len(dataset),
-        "csv_file": "movenet_motion_dataset_with_window_scores.csv"
+        "csv_file": "yolo_motion_dataset_with_window_scores.csv"
     })
 
 if __name__ == '__main__':
