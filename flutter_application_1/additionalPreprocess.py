@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 
 file_paths = ['mediapipe_motion_dataset_with_window_scores.csv', 
               'movenet_motion_dataset_with_window_scores.csv',
@@ -117,7 +117,8 @@ common_columns_after |= required_columns  # מוסיף בכוח אם חסרות
 # כעת ממשיכים כרגיל:
 dfs_filtered = []
 for df in dfs_standardized:
-    df_filtered = df[list(common_columns_after)]
+    existing_columns = [col for col in common_columns_after if col in df.columns]
+    df_filtered = df[existing_columns]
     dfs_filtered.append(df_filtered)
 
 output_file_paths = ['df_yolo_filtered.csv', 'df_movenet_filtered.csv', 'df_mediapipe_filtered.csv']
@@ -176,6 +177,30 @@ file_paths = ['df_yolo_filtered.csv',
 
 dfs = [pd.read_csv(path) for path in file_paths]
 
+for df in dfs:
+    df['window_id'] = (
+        df.get('window_id') or 
+        df.get('window_index') or 
+        df.get('chunk_index') or 
+        np.nan
+    )
+
+import numpy as np
+
+for df in dfs:
+    if 'window_id' in df.columns:
+        df['window_id'] = df['window_id']
+    elif 'window_index' in df.columns:
+        df['window_id'] = df['window_index']
+    elif 'chunk_index' in df.columns:
+        df['window_id'] = df['chunk_index']
+    elif 'frames' in df.columns:
+        # חלוקה של כל 60 פריימים לאותו window_id
+        df['window_id'] = (df['frames'] // 60).astype(int)
+    else:
+        df['window_id'] = np.nan
+
+                                                 
 common_columns = set(dfs[0].columns)  
 
 for df in dfs[1:]:
