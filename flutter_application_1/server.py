@@ -115,11 +115,14 @@ def run_main():
         print(f"{script} is ready on port {port}.")
     '''
 
+    
+    '''
     scripts_stage_1 = [
         ("movenetPreprocess.py", 5000, "movenet_motion_dataset_with_window_scores.csv"),
         ("yoloPreprocess.py", 5002, "yolo_motion_dataset_with_window_scores.csv"),
         ("mediapipePreprocess.py", 5004, "mediapipe_motion_dataset_with_window_scores.csv")
     ]
+    
     
 
     for script, port, output_file in scripts_stage_1:
@@ -147,6 +150,39 @@ def run_main():
 
     print("Step 1 complete: All initial scripts have been started.")
 
+    '''
+
+
+    script = "allModelspreprocess.py"
+    port = 5000
+
+    print(f"Running {script}...")
+    process = subprocess.Popen(["python", script])
+
+    wait_for_server("127.0.0.1", port)
+
+    expected_outputs = [
+        "movenet_motion_dataset_with_window_scores.csv",
+        "yolo_motion_dataset_with_window_scores.csv",
+        "mediapipe_motion_dataset_with_window_scores.csv"
+    ]
+
+    for output_file in expected_outputs:
+        wait_for_file(".", output_file)
+
+    process.terminate()
+    try:
+        process.wait(timeout=5)
+        print(f"{script} terminated cleanly.")
+    except subprocess.TimeoutExpired:
+        process.kill()
+        print(f"{script} forcefully killed.")
+
+    print("Step 1 complete: allModelspreprocess.py finished processing all models.")
+
+
+
+
     # Run further processing script - this will wait until it finishes
     print("Running additionalPreprocess.py...")
     subprocess.run(["python", "additionalPreprocess.py"])
@@ -160,4 +196,4 @@ def run_main():
 if __name__ == "__main__":
     run_main()  
     print("All preprocessing done. Starting server.")
-    app.run(debug=True)  
+    app.run(debug=False)  

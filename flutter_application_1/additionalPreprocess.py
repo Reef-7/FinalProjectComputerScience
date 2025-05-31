@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-file_paths = ['mediapipe_motion_dataset_with_windows_scores.csv', 
+file_paths = ['mediapipe_motion_dataset_with_window_scores.csv', 
               'movenet_motion_dataset_with_window_scores.csv',
               'yolo_motion_dataset_with_window_scores.csv']
 
@@ -56,7 +56,7 @@ df_movenet = pd.read_csv("movenet_motion_dataset_with_window_scores.csv")
 df_movenet = standardize_column_names(df_movenet, "movenet")
 
 
-df_mediapipe = pd.read_csv("mediapipe_motion_dataset_with_windows_scores.csv")
+df_mediapipe = pd.read_csv("mediapipe_motion_dataset_with_window_scores.csv")
 df_mediapipe = standardize_column_names(df_mediapipe, "mediapipe")
 
 dfs = [df_yolo, df_movenet, df_mediapipe]
