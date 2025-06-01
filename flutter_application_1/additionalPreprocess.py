@@ -133,9 +133,15 @@ for df in dfs_standardized[1:]:
 # נוודא שהעמודות הדרושות בפנים
 common_columns_after |= required_columns  # מוסיף בכוח אם חסרות
 
+
+
 # כעת ממשיכים כרגיל:
 dfs_filtered = []
 for df in dfs_standardized:
+    if 'window_id' not in df.columns:
+         # יוצרים עמודת window_id שבה כל 60 שורות מקבלות את אותו מספר
+        df['window_id'] = (df.index // 60)
+
     df_filtered = df[list(common_columns_after)]
     dfs_filtered.append(df_filtered)
 
@@ -144,7 +150,6 @@ for df_filtered, output_path in zip(dfs_filtered, output_file_paths):
     print(f"Saving to {output_path}, columns: {df_filtered.columns.tolist()}")
     df_filtered.to_csv(output_path, index=False)
 
-import pandas as pd
 
 def normalize_to_0_10_using_z(df, column_name):
     # חישוב ממוצע וסטיית תקן
@@ -161,9 +166,7 @@ def normalize_to_0_10_using_z(df, column_name):
     normalized_scores = (z_scores_clipped + 2) * 2.5  # מביא את הציונים לטווח 0-10
     return normalized_scores
 
-# נניח ש- dfs הוא רשימת ה-DataFrames שלך
-for df in dfs:
-    df['overall_movement_score'] = normalize_to_0_10_using_z(df, 'overall_movement_score')
+
 
 # שמירה של התוצאות
 output_file_paths = ['df_yolo_filtered.csv', 'df_movenet_filtered.csv', 'df_mediapipe_filtered.csv']
@@ -176,31 +179,7 @@ file_paths = ['df_yolo_filtered.csv',
 
 
 dfs = [pd.read_csv(path) for path in file_paths]
-
-for df in dfs:
-    df['window_id'] = (
-        df.get('window_id') or 
-        df.get('window_index') or 
-        df.get('chunk_index') or 
-        np.nan
-    )
-
-import numpy as np
-
-for df in dfs:
-    if 'window_id' in df.columns:
-        df['window_id'] = df['window_id']
-    elif 'window_index' in df.columns:
-        df['window_id'] = df['window_index']
-    elif 'chunk_index' in df.columns:
-        df['window_id'] = df['chunk_index']
-    elif 'frames' in df.columns:
-        # חלוקה של כל 60 פריימים לאותו window_id
-        df['window_id'] = (df['frames'] // 60).astype(int)
-    else:
-        df['window_id'] = np.nan
-
-                                                 
+                                
 common_columns = set(dfs[0].columns)  
 
 for df in dfs[1:]:
