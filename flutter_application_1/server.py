@@ -38,7 +38,7 @@ def wait_for_video(upload_folder, video_extensions=None):
             print(f"Found video file(s): {video_files}")
             break
         time.sleep(2)  #wait 2 seconds before checking again
-
+'''
 def wait_for_server(host, port, timeout=30):
     start = time.time()
     while True:
@@ -50,6 +50,21 @@ def wait_for_server(host, port, timeout=30):
             if time.time() - start > timeout:
                 raise TimeoutError(f"Server at {host}:{port} did not start within {timeout} seconds.")
             time.sleep(1)
+'''
+
+
+def wait_for_server(host, port, retry_interval=1):
+    print(f"Waiting for server at {host}:{port} to become available...")
+    while True:
+        try:
+            with socket.create_connection((host, port), timeout=2):
+                print(f"✅ Server is up at {host}:{port}")
+                return
+        except (OSError, ConnectionRefusedError):
+            print(f"⏳ Still waiting for server at {host}:{port}...")
+            time.sleep(retry_interval)
+
+
 
 def wait_for_file(directory, filename, timeout=60):
     """Wait until a specific file appears in a directory (or current directory)."""

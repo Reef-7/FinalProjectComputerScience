@@ -7,24 +7,13 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/predict')
-def predict():
+model_yolo = load_model('models/best_yolo_infant_movement_model.keras')
+model_movenet = load_model('models/best_movenet_infant_movement_model.keras')
+model_mediapipe = load_model('models/best_mediapipe_infant_movement_model.keras')
 
-    rmse_values = {
-        'yolo': 0.7082,
-        'movenet': 1.7612,
-        'mediapipe': 0.9285
-    }
-    inv = {k: 1/v for k, v in rmse_values.items()}
-    total = sum(inv.values())
-    weights_motion = [inv['yolo']/total, inv['movenet']/total, inv['mediapipe']/total]
+print("Models Loaded Successfully")
 
-
-    model_yolo = load_model('models/best_yolo_infant_movement_model.keras')
-    model_movenet = load_model('models/best_movenet_infant_movement_model.keras')
-    model_mediapipe = load_model('models/best_mediapipe_infant_movement_model.keras')
-
-    def predict_all_models(X_tests):
+def predict_all_models(X_tests):
         preds = {}
         for name, model in {
             'yolo': model_yolo,
@@ -42,7 +31,7 @@ def predict():
         return preds
 
 # Ensemble function
-    def ensemble_predictions(preds, weights=None, vote_type='majority', class_weights=None):
+def ensemble_predictions(preds, weights=None, vote_type='majority', class_weights=None):
         model_names = list(preds.keys())
         n_models = len(model_names)
 
@@ -82,10 +71,33 @@ def predict():
 
         return movement_ensemble, knee_ensemble, elbow_ensemble
 
-    def run_ensemble_evaluation(X_test, y_true_movement, y_true_knee, y_true_elbow):
+
+def run_ensemble_evaluation(X_test, y_true_movement, y_true_knee, y_true_elbow):
         preds = predict_all_models(X_test)
         movement_pred, knee_pred, elbow_pred = ensemble_predictions(preds, weights=weights_motion, vote_type='majority')
-    
+
+TIMESTEPS = 30
+STEP = 30  # קפיצה של חלון שלם, בלי חפיפה
+def create_sequences_sampled(X, timesteps, step=STEP):
+        sequences = []
+        for i in range(0, len(X) - timesteps + 1, step):
+            sequences.append(X[i:i+timesteps])
+        return np.array(sequences)
+
+
+rmse_values = {
+        'yolo': 0.7082,
+        'movenet': 1.7612,
+        'mediapipe': 0.9285
+    }
+inv = {k: 1/v for k, v in rmse_values.items()}
+total = sum(inv.values())
+weights_motion = [inv['yolo']/total, inv['movenet']/total, inv['mediapipe']/total]
+
+
+@app.route('/predict')
+def predict():
+
     df_yolo = pd.read_csv('test_yolo_dataset.csv')
     df_movenet = pd.read_csv('test_movenet_dataset.csv')
     df_mediapipe = pd.read_csv('test_mediapipe_dataset.csv')
@@ -124,13 +136,7 @@ def predict():
     X_test_mediapipe = df_mediapipe_filtered[feature_columns].values
 
 
-    TIMESTEPS = 30
-    STEP = 30  # קפיצה של חלון שלם, בלי חפיפה
-    def create_sequences_sampled(X, timesteps, step=STEP):
-        sequences = []
-        for i in range(0, len(X) - timesteps + 1, step):
-            sequences.append(X[i:i+timesteps])
-        return np.array(sequences)
+ 
 
     X_test_yolo_seq = create_sequences_sampled(X_test_yolo, TIMESTEPS, STEP)
     X_test_movenet_seq = create_sequences_sampled(X_test_movenet, TIMESTEPS, STEP)
