@@ -2,10 +2,11 @@ from tensorflow.keras.models import load_model
 import numpy as np
 from scipy.stats import mode
 import pandas as pd
-
+from flask_cors import CORS
 from flask import Flask, jsonify
 
 app = Flask(__name__)
+CORS(app) 
 
 model_yolo = load_model('models/best_yolo_infant_movement_model.keras')
 model_movenet = load_model('models/best_movenet_infant_movement_model.keras')

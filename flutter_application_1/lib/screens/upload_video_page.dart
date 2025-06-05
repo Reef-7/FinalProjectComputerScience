@@ -3,6 +3,7 @@ import 'dart:html' as html;
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:html' as html;
+import 'predictions_page.dart';
 
 class UploadVideoPage extends StatefulWidget {
   const UploadVideoPage({super.key});
@@ -101,6 +102,36 @@ class _UploadVideoPageState extends State<UploadVideoPage> {
               icon: Icon(Icons.video_library),
               label: Text("Pick Video"),
               onPressed: _pickVideo,
+            ),
+            SizedBox(height: 40),
+            //results page navigation
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.analytics, size: 28),
+                label: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14.0, horizontal: 8),
+                  child: Text(
+                    "Results",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 6,
+                  shadowColor: Colors.deepPurpleAccent,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => const PredictionPage()),
+                  );
+                },
+              ),
             ),
           ],
         ),
