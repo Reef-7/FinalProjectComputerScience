@@ -202,9 +202,18 @@ file_paths = ['df_yolo_filtered.csv',
 dfs = [pd.read_csv(path) for path in file_paths]
 
 columns_to_drop = df.columns[df.columns.str.contains('acceleration')]
-for df in dfs:
+for i in range(len(dfs)):
+    df = dfs[i]
+
+    # Drop acceleration columns if they exist
     cols_in_df = [col for col in columns_to_drop if col in df.columns]
     df = df.drop(columns=cols_in_df)
+
+    # Rename 'window_index' to 'window_id' if it exists
+    if 'window_index' in df.columns:
+        df = df.rename(columns={'window_index': 'window_id'})
+
+    dfs[i] = df  # Update the list with the modified DataFrame
 
 df1, df2 = dfs[-2], dfs[-1]
 columns_df1 = set(df1.columns)

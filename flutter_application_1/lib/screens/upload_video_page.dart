@@ -33,11 +33,21 @@ class _UploadVideoPageState extends State<UploadVideoPage> {
 
   Future<void> sendVideoToMultipleServers(html.File file) async {
     final reader = html.FileReader();
-    reader.readAsArrayBuffer(file);
-    reader.onLoadEnd.listen((e) async {
-      final bytes = reader.result as List<int>;
 
-      // רשימת כתובות השרתים
+    final completer = Completer<List<int>>();
+    reader.readAsArrayBuffer(file);
+
+    reader.onLoadEnd.listen((e) {
+      completer.complete(reader.result as List<int>);
+    });
+
+    reader.onError.listen((e) {
+      completer.completeError(Exception("Failed to read file"));
+    });
+
+    try {
+      final bytes = await completer.future;
+
       final uris = [
         Uri.parse('http://localhost:5000/upload/movenet'),
         Uri.parse('http://localhost:5000/upload/yolo'),
@@ -47,8 +57,7 @@ class _UploadVideoPageState extends State<UploadVideoPage> {
       for (final uri in uris) {
         final request = http.MultipartRequest('POST', uri);
         request.files.add(
-          http.MultipartFile.fromBytes('file', bytes, filename: file.name),
-        );
+            http.MultipartFile.fromBytes('file', bytes, filename: file.name));
 
         try {
           final response = await request.send();
@@ -61,7 +70,9 @@ class _UploadVideoPageState extends State<UploadVideoPage> {
           print('Error uploading to $uri: $e');
         }
       }
-    });
+    } catch (e) {
+      print("Error reading file: $e");
+    }
   }
 
   @override
