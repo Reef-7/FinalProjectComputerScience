@@ -36,6 +36,7 @@ dependencies:
   firebase_auth: ^5.4.1
   cloud_firestore: ^5.0.0
   image_picker: ^1.0.7  
+  fl_chart: ^0.64.0
   video_player: ^2.8.2  # video play library
   http: ^1.2.1  # library for sending the video to the server
 
