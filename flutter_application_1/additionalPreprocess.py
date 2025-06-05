@@ -10,15 +10,17 @@ dfs = [pd.read_csv(path) for path in file_paths]
 
 
 keypoint_map = {
-    "left_shoulder": [("keypoint_5", "movenet"), ("keypoint_11", "mediapipe")],
-    "right_shoulder": [("keypoint_6", "movenet"), ("keypoint_12", "mediapipe")],
-    "left_elbow": [("keypoint_7", "movenet"), ("keypoint_13", "mediapipe")],
-    "right_elbow": [("keypoint_8", "movenet"), ("keypoint_14", "mediapipe")],
-    "left_hip": [("keypoint_11", "movenet"), ("keypoint_23", "mediapipe")],
-    "right_hip": [("keypoint_12", "movenet"), ("keypoint_24", "mediapipe")],
-    "left_knee": [("keypoint_13", "movenet"), ("keypoint_25", "mediapipe")],
-    "right_knee": [("keypoint_14", "movenet"), ("keypoint_26", "mediapipe")]
+    "left_shoulder": [("keypoint_5", "movenet"), ("keypoint_11", "mediapipe"), ("keypoint_5", "yolo")],
+    "right_shoulder": [("keypoint_6", "movenet"), ("keypoint_12", "mediapipe"), ("keypoint_6", "yolo")],
+    "left_elbow": [("keypoint_7", "movenet"), ("keypoint_13", "mediapipe"), ("keypoint_7", "yolo")],
+    "right_elbow": [("keypoint_8", "movenet"), ("keypoint_14", "mediapipe"), ("keypoint_8", "yolo")],
+    "left_hip": [("keypoint_11", "movenet"), ("keypoint_23", "mediapipe"), ("keypoint_11", "yolo")],
+    "right_hip": [("keypoint_12", "movenet"), ("keypoint_24", "mediapipe"), ("keypoint_12", "yolo")],
+    "left_knee": [("keypoint_13", "movenet"), ("keypoint_25", "mediapipe"), ("keypoint_13", "yolo")],
+    "right_knee": [("keypoint_14", "movenet"), ("keypoint_26", "mediapipe"), ("keypoint_14", "yolo")]
 }
+
+
 
 def standardize_column_names(df, model_name):
     rename_dict = {}
@@ -51,6 +53,7 @@ def standardize_column_names(df, model_name):
     return df.rename(columns=rename_dict)
 
 df_yolo = pd.read_csv("yolo_motion_dataset_with_window_scores.csv")
+df_movenet = standardize_column_names(df_yolo, "yolo")
 
 df_movenet = pd.read_csv("movenet_motion_dataset_with_window_scores.csv")
 df_movenet = standardize_column_names(df_movenet, "movenet")
@@ -235,9 +238,9 @@ only_in_df2 = columns_df2 - columns_df1
 
 df1, df2,df3 = dfs[0], dfs[1],dfs[2]
 
-df1 = df1.drop(columns={'right_shoulder_score', 'left_shoulder_score', 'right_hip_score', 'left_hip_score'})
-df2 = df2.drop(columns={'left_elbow_acceleration_x', 'left_knee_acceleration_x', 'left_shoulder_acceleration_y', 'right_knee_acceleration_y', 'right_elbow_acceleration_y', 'right_elbow_acceleration_x', 'right_hip_acceleration_y', 'left_hip_acceleration_x', 'right_hip_acceleration_x', 'right_shoulder_acceleration_y', 'left_hip_acceleration_y', 'right_shoulder_acceleration_x', 'left_shoulder_acceleration_x', 'left_knee_acceleration_y', 'left_elbow_acceleration_y', 'right_knee_acceleration_x'})
-df3 = df3.drop(columns={'left_elbow_acceleration_x', 'left_knee_acceleration_x', 'left_shoulder_acceleration_y', 'right_knee_acceleration_y', 'right_elbow_acceleration_y', 'right_elbow_acceleration_x', 'right_hip_acceleration_y', 'left_hip_acceleration_x', 'right_hip_acceleration_x', 'right_shoulder_acceleration_y', 'left_hip_acceleration_y', 'right_shoulder_acceleration_x', 'left_shoulder_acceleration_x', 'left_knee_acceleration_y', 'left_elbow_acceleration_y', 'right_knee_acceleration_x'})
+df1 = df1.drop(columns={'right_shoulder_score', 'left_shoulder_score', 'right_hip_score', 'left_hip_score'} , errors='ignore')
+df2 = df2.drop(columns={'left_elbow_acceleration_x', 'left_knee_acceleration_x', 'left_shoulder_acceleration_y', 'right_knee_acceleration_y', 'right_elbow_acceleration_y', 'right_elbow_acceleration_x', 'right_hip_acceleration_y', 'left_hip_acceleration_x', 'right_hip_acceleration_x', 'right_shoulder_acceleration_y', 'left_hip_acceleration_y', 'right_shoulder_acceleration_x', 'left_shoulder_acceleration_x', 'left_knee_acceleration_y', 'left_elbow_acceleration_y', 'right_knee_acceleration_x'}, errors='ignore')
+df3 = df3.drop(columns={'left_elbow_acceleration_x', 'left_knee_acceleration_x', 'left_shoulder_acceleration_y', 'right_knee_acceleration_y', 'right_elbow_acceleration_y', 'right_elbow_acceleration_x', 'right_hip_acceleration_y', 'left_hip_acceleration_x', 'right_hip_acceleration_x', 'right_shoulder_acceleration_y', 'left_hip_acceleration_y', 'right_shoulder_acceleration_x', 'left_shoulder_acceleration_x', 'left_knee_acceleration_y', 'left_elbow_acceleration_y', 'right_knee_acceleration_x'}, errors='ignore')
 
 
 
