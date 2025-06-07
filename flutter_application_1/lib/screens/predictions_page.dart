@@ -13,6 +13,7 @@ class PredictionPage extends StatefulWidget {
 class _PredictionPageState extends State<PredictionPage> {
   List<FlSpot> movementSpots = [];
   bool isLoading = true;
+  int selectedGraph = 0;
 
   @override
   void initState() {
@@ -47,6 +48,87 @@ class _PredictionPageState extends State<PredictionPage> {
     }
   }
 
+  Widget buildGraphView() {
+    switch (selectedGraph) {
+      case 0:
+        return LineChart(
+          LineChartData(
+            minY: 0,
+            maxY: 10,
+            lineBarsData: [
+              LineChartBarData(
+                spots: movementSpots,
+                isCurved: true,
+                barWidth: 2,
+                color: Colors.blue,
+                dotData: FlDotData(
+                  show: true,
+                  getDotPainter: (spot, percent, barData, index) {
+                    if (spot.x % 1 == 0) {
+                      return FlDotCirclePainter(
+                        radius: 4,
+                        color: Colors.red,
+                        strokeWidth: 2,
+                        strokeColor: Colors.black,
+                      );
+                    }
+                    return FlDotCirclePainter(
+                      radius: 0,
+                      color: Colors.transparent,
+                      strokeWidth: 0,
+                      strokeColor: Colors.transparent,
+                    );
+                  },
+                ),
+              )
+            ],
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(
+                axisNameWidget: const Text('Movement Score'),
+                axisNameSize: 32,
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 40,
+                  getTitlesWidget: (value, meta) {
+                    return Text(
+                      value.toStringAsFixed(1),
+                      style: const TextStyle(fontSize: 12),
+                      textAlign: TextAlign.center,
+                    );
+                  },
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                axisNameWidget: const Text('Time Window'),
+                axisNameSize: 28,
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 22,
+                  getTitlesWidget: (value, meta) {
+                    return Text(
+                      value.toInt().toString(),
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  },
+                ),
+              ),
+            ),
+            borderData: FlBorderData(show: true),
+            gridData: FlGridData(show: true),
+          ),
+        );
+
+      case 1:
+        return Center(
+            child: Text('Dominant Knee', style: TextStyle(fontSize: 20)));
+      case 2:
+        return Center(
+            child: Text('Dominant Elbow', style: TextStyle(fontSize: 20)));
+      default:
+        return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,74 +139,42 @@ class _PredictionPageState extends State<PredictionPage> {
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: LineChart(
-                  LineChartData(
-                    minY: 0,
-                    maxY: 10,
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: movementSpots,
-                        isCurved: true,
-                        barWidth: 2,
-                        color: Colors.blue,
-                        dotData: FlDotData(
-                          show: true,
-                          getDotPainter: (spot, percent, barData, index) {
-                            if (spot.x % 1 == 0) {
-                              return FlDotCirclePainter(
-                                radius: 4,
-                                color: Colors.red,
-                                strokeWidth: 2,
-                                strokeColor: Colors.black,
-                              );
-                            }
-                            return FlDotCirclePainter(
-                              radius: 0,
-                              color: Colors.transparent,
-                              strokeWidth: 0,
-                              strokeColor: Colors.transparent,
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        axisNameWidget: const Text('Movement Score'),
-                        axisNameSize: 32,
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          getTitlesWidget: (value, meta) {
-                            return Text(
-                              value.toStringAsFixed(1),
-                              style: const TextStyle(fontSize: 12),
-                              textAlign: TextAlign.center,
-                            );
-                          },
-                        ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => setState(() => selectedGraph = 0),
+                        child: const Text('Movement Score'),
                       ),
-                      bottomTitles: AxisTitles(
-                        axisNameWidget: const Text('Time Window'),
-                        axisNameSize: 28,
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 22,
-                          getTitlesWidget: (value, meta) {
-                            return Text(
-                              value.toInt().toString(),
-                              style: const TextStyle(fontSize: 12),
-                            );
-                          },
-                        ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () => setState(() => selectedGraph = 1),
+                        child: const Text('Dominant Knee'),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () => setState(() => selectedGraph = 2),
+                        child: const Text('Dominant Elbow'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                      child: SizedBox(
+                        key: ValueKey(selectedGraph),
+                        width: double.infinity,
+                        child: buildGraphView(),
                       ),
                     ),
-                    borderData: FlBorderData(show: true),
-                    gridData: FlGridData(show: true),
                   ),
-                ),
+                ],
               ),
             ),
     );
