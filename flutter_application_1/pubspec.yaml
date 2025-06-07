@@ -73,6 +73,10 @@ flutter:
     - assets/Movement.jpg
     - assets/knee.jpg
     - assets/elbow.jpg
+    - assets/videos/elbow_left.mp4
+    - assets/videos/elbow_right.mp4
+    - assets/videos/knee_left.mp4
+    - assets/videos/knee_right.mp4
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
