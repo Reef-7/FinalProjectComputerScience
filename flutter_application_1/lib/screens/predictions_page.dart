@@ -142,21 +142,55 @@ class _PredictionPageState extends State<PredictionPage> {
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ElevatedButton(
-                        onPressed: () => setState(() => selectedGraph = 0),
-                        child: const Text('Movement Score'),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/Movement.jpg',
+                            width: 64,
+                            height: 64,
+                            filterQuality: FilterQuality.high,
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () => setState(() => selectedGraph = 0),
+                            child: const Text('Movement Score'),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () => setState(() => selectedGraph = 1),
-                        child: const Text('Dominant Knee'),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/knee.jpg',
+                            width: 64,
+                            height: 64,
+                            filterQuality: FilterQuality.high,
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () => setState(() => selectedGraph = 1),
+                            child: const Text('Dominant Knee'),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () => setState(() => selectedGraph = 2),
-                        child: const Text('Dominant Elbow'),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/elbow.jpg',
+                            width: 64,
+                            height: 64,
+                            filterQuality: FilterQuality.high,
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () => setState(() => selectedGraph = 2),
+                            child: const Text('Dominant Elbow'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
