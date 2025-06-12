@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
+import 'video_player_widget.dart';
 
 class PredictionPage extends StatefulWidget {
   const PredictionPage({super.key});
@@ -12,6 +13,8 @@ class PredictionPage extends StatefulWidget {
 
 class _PredictionPageState extends State<PredictionPage> {
   List<FlSpot> movementSpots = [];
+  List<int> elbowPredictions = [];
+  List<int> kneePredictions = [];
   bool isLoading = true;
   int selectedGraph = 0;
 
@@ -29,14 +32,23 @@ class _PredictionPageState extends State<PredictionPage> {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        final spots = data.map<FlSpot>((item) {
+        final spots = <FlSpot>[];
+        final elbow = <int>[];
+        final knee = <int>[];
+
+        for (var item in data) {
           final double x = (item['window_id'] as num).toDouble();
           final double y = (item['movement_prediction'] as num).toDouble();
-          return FlSpot(x, y);
-        }).toList();
+          spots.add(FlSpot(x, y));
+
+          elbow.add(item['elbow_prediction'] as int);
+          knee.add(item['knee_prediction'] as int);
+        }
 
         setState(() {
           movementSpots = spots;
+          elbowPredictions = elbow;
+          kneePredictions = knee;
           isLoading = false;
         });
       } else {
@@ -119,14 +131,36 @@ class _PredictionPageState extends State<PredictionPage> {
         );
 
       case 1:
-        return Center(
-            child: Text('Dominant Knee', style: TextStyle(fontSize: 20)));
+        return buildDominantVideo(kneePredictions, 'knee');
       case 2:
-        return Center(
-            child: Text('Dominant Elbow', style: TextStyle(fontSize: 20)));
+        return buildDominantVideo(elbowPredictions, 'elbow');
+
       default:
         return Container();
     }
+  }
+
+  Widget buildDominantVideo(List<int> predictions, String jointName) {
+    return ListView.builder(
+      itemCount: predictions.length,
+      itemBuilder: (context, index) {
+        final side = predictions[index] == 0 ? 'left' : 'right';
+        final videoAsset =
+            'assets/videos/${jointName}_$side.mp4'; // לדוגמה elbow_left.mp4
+
+        return Column(
+          children: [
+            Text('Window ${index + 1}: ${side.toUpperCase()}'),
+            const SizedBox(height: 8),
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: VideoPlayerWidget(assetPath: videoAsset),
+            ),
+            const Divider(),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -148,7 +182,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/Movement.jpg',
+                            'assets/Movement.png',
                             width: 64,
                             height: 64,
                             filterQuality: FilterQuality.high,
@@ -164,7 +198,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/knee.jpg',
+                            'assets/knee.png',
                             width: 64,
                             height: 64,
                             filterQuality: FilterQuality.high,
@@ -180,7 +214,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/elbow.jpg',
+                            'assets/elbow.png',
                             width: 64,
                             height: 64,
                             filterQuality: FilterQuality.high,
