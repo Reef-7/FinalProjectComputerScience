@@ -182,7 +182,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/Movement.jpg',
+                            'assets/Movement.png',
                             width: 64,
                             height: 64,
                             filterQuality: FilterQuality.high,
@@ -198,7 +198,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/knee.jpg',
+                            'assets/knee.png',
                             width: 64,
                             height: 64,
                             filterQuality: FilterQuality.high,
@@ -214,7 +214,7 @@ class _PredictionPageState extends State<PredictionPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/elbow.jpg',
+                            'assets/elbow.png',
                             width: 64,
                             height: 64,
                             filterQuality: FilterQuality.high,
