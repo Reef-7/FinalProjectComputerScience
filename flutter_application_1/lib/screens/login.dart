@@ -51,10 +51,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         email: _emailController.text,
         password: _passwordController.text,
       );
+      final displayName = userCredential.user?.displayName ?? 'User';
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Logged in successfully')),
       );
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(
+        context,
+        '/upload_video',
+        arguments: displayName,
+      );
     } on FirebaseAuthException catch (e) {
       String message;
       if (e.code == 'user-not-found') {
