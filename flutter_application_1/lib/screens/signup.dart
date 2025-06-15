@@ -60,6 +60,11 @@ class _SignupPageState extends State<SignupPage>
           email: cleanEmail(_emailController.text),
           password: _passwordController.text,
         );
+        await userCredential.user
+            ?.updateDisplayName(_usernameController.text.trim());
+
+// (אופציונלי) רענון המשתמש לקבלת העדכון
+        await userCredential.user?.reload();
 
         print('User created: ${userCredential.user?.uid}'); // Debug print
 

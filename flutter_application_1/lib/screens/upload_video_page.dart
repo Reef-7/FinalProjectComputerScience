@@ -182,6 +182,9 @@ class _UploadVideoPageState extends State<UploadVideoPage>
 
   @override
   Widget build(BuildContext context) {
+    final username =
+        ModalRoute.of(context)?.settings.arguments as String? ?? 'User';
+
     return Scaffold(
       backgroundColor: const Color(0xFFfdf8f4),
       appBar: AppBar(
@@ -215,8 +218,8 @@ class _UploadVideoPageState extends State<UploadVideoPage>
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              "Welcome!",
+            Text(
+              "Welcome, $username!",
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
